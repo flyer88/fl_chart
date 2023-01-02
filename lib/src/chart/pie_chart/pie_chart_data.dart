@@ -149,19 +149,25 @@ class PieChartSectionData {
     Color? color,
     double? radius,
     bool? showTitle,
+    bool? showTitleOutLine,
     this.titleStyle,
     String? title,
     BorderSide? borderSide,
     this.badgeWidget,
     double? titlePositionPercentageOffset,
+    double? titileLineOutCircleOffset,
+    double? titileLineOutCircleWidth,
     double? badgePositionPercentageOffset,
   })  : value = value ?? 10,
         color = color ?? Colors.cyan,
         radius = radius ?? 40,
         showTitle = showTitle ?? true,
+        showTitleOutLine = showTitleOutLine ?? false,
         title = title ?? (value == null ? '' : value.toString()),
         borderSide = borderSide ?? const BorderSide(width: 0),
         titlePositionPercentageOffset = titlePositionPercentageOffset ?? 0.5,
+        titileLineOutCircleOffset = titileLineOutCircleOffset ?? 0,
+        titileLineOutCircleWidth = titileLineOutCircleWidth ?? 1,
         badgePositionPercentageOffset = badgePositionPercentageOffset ?? 0.5;
 
   /// It determines how much space it should occupy around the circle.
@@ -180,6 +186,9 @@ class PieChartSectionData {
 
   /// Defines show or hide the title of section.
   final bool showTitle;
+
+  /// Defines show or hide the line below the title.
+  final bool showTitleOutLine;
 
   /// Defines style of showing title of section.
   final TextStyle? titleStyle;
@@ -202,6 +211,18 @@ class PieChartSectionData {
   /// 0.0 means near the center,
   /// 1.0 means near the outside of the [PieChart].
   final double titlePositionPercentageOffset;
+
+  /// Defines the title line out circle's offset
+  ///
+  /// It should be double.
+  /// Default value is 0.
+  final double titileLineOutCircleOffset;
+
+  /// Defines the title line out circle's width
+  ///
+  /// It should be double.
+  /// Default value is 1.
+  final double titileLineOutCircleWidth;
 
   /// Defines position of badge widget in the section.
   ///

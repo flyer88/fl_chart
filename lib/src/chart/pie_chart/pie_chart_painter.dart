@@ -321,7 +321,7 @@ class PieChartPainter extends BaseChartPainter<PieChartData> {
       final section = data.sections[i];
       final startAngle = tempAngle;
       final sweepAngle = 360 * (section.value / data.sumValue);
-      final sectionCenterAngle = startAngle + (sweepAngle / 2);
+      final sectionCenterAngle = (startAngle + (sweepAngle / 2)) % 360;
 
       Offset sectionCenter(double percentageOffset) =>
           center +
@@ -347,14 +347,105 @@ class PieChartPainter extends BaseChartPainter<PieChartData> {
           textScaleFactor: holder.textScale,
         )..layout();
 
-        canvasWrapper.drawText(
-          tp,
-          sectionCenterOffsetTitle - Offset(tp.width / 2, tp.height / 2),
-        );
+        if (section.showTitleOutLine) {
+          darwTitleOutLine(
+            canvasWrapper,
+            center,
+            sectionCenterAngle,
+            centerRadius,
+            section,
+            tp,
+          );
+        } else {
+          canvasWrapper.drawText(
+            tp,
+            sectionCenterOffsetTitle - Offset(tp.width / 2, tp.height / 2),
+          );
+        }
       }
 
       tempAngle += sweepAngle;
     }
+  }
+
+  void darwTitleOutLine(
+    CanvasWrapper canvasWrapper,
+    Offset center,
+    double sectionCenterAngle,
+    double centerRadius,
+    PieChartSectionData section,
+    TextPainter tp,
+  ) {
+    final titleLineStartPoistion = center +
+        Offset(
+          math.cos(Utils().radians(sectionCenterAngle)) *
+              (centerRadius +
+                  (section.radius * section.titlePositionPercentageOffset)),
+          math.sin(Utils().radians(sectionCenterAngle)) *
+              (centerRadius +
+                  (section.radius * section.titlePositionPercentageOffset)),
+        );
+    final titleLineTurningPoistion = center +
+        Offset(
+          math.cos(Utils().radians(sectionCenterAngle)) *
+              (centerRadius +
+                  (section.radius) +
+                  section.titileLineOutCircleOffset),
+          math.sin(Utils().radians(sectionCenterAngle)) *
+              (centerRadius +
+                  (section.radius) +
+                  section.titileLineOutCircleOffset),
+        );
+
+    final titleLinePaint = Paint()
+      ..color = tp.text?.style!.color ?? Colors.white
+      ..strokeWidth = section.titileLineOutCircleWidth
+      ..style = PaintingStyle.fill;
+
+    var endPointX = 0.0;
+    var textX = 0.0;
+    var textY = 0.0;
+    if (sectionCenterAngle >= 0 && sectionCenterAngle < 90) {
+      endPointX = tp.width;
+      textX = 0;
+      textY = -tp.height;
+    } else if (sectionCenterAngle >= 90 && sectionCenterAngle < 180) {
+      endPointX = -tp.width;
+      textX = -tp.width;
+      textY = -tp.height;
+    } else if (sectionCenterAngle >= 180 && sectionCenterAngle < 270) {
+      endPointX = -tp.width;
+      textX = -tp.width;
+      textY = 0;
+    } else {
+      endPointX = tp.width;
+      textX = 0;
+      textY = 0;
+    }
+
+    canvasWrapper
+      ..drawLine(
+        titleLineStartPoistion,
+        titleLineTurningPoistion,
+        titleLinePaint,
+      )
+      ..drawLine(
+        titleLineTurningPoistion,
+        titleLineTurningPoistion +
+            Offset(
+              endPointX,
+              0,
+            ),
+        titleLinePaint,
+      )
+      ..drawText(
+        tp,
+        titleLineTurningPoistion +
+            Offset(
+              textX,
+              textY,
+            ),
+      );
   }
 
   /// Calculates center radius based on the provided sections radius
